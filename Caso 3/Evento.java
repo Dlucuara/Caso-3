@@ -8,8 +8,9 @@ public class Evento {
         this.TipoYServidor = tipoYServidor;
     }
 
+    // se define un evento de fin con tipoYServidor = -1
     public boolean Esfin() {
-        return TipoYServidor == -1;
+        return TipoYServidor == -1; 
     }
 
 

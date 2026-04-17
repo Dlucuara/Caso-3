@@ -62,7 +62,7 @@ public class Brokers extends Thread {
             eventosProcessados++;
         }
         eventoFin = new Evento(id, -1);
-        administrador.recibirEventoFin(eventoFin);
+        administrador.recibirEventoFin(eventoFin); // sugerencia de hacer una clase de buzon admin
         System.out.println("Broker " + id + " terminó.");
         
     }

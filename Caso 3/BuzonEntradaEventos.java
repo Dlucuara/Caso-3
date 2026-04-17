@@ -2,19 +2,14 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class BuzonEntradaEventos {
-    private int capacidadBuzon;
     private Queue<Evento> eventos;
 
-    public BuzonEntradaEventos(int capacidad) {
-        this.capacidadBuzon = capacidad;
+    public BuzonEntradaEventos() {
         this.eventos = new LinkedList<>();
     }
 
     public synchronized boolean estaLleno() {
-        if (eventos.size() >= capacidadBuzon) {
-            return true; 
-        }
-        return false;
+        return false; // nunca se llena porque es ilimitado
     }
 
     public synchronized void depositarEvento(Evento evento) {
@@ -31,7 +26,6 @@ public class BuzonEntradaEventos {
             }
         }
         Evento e = eventos.poll();
-        notifyAll();
         return e;
     }
 }

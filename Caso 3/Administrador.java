@@ -15,9 +15,8 @@ public class Administrador extends Thread {
         eventosRecibidos = new LinkedList<>();
     }
 
-    public void leerEventos(){
-        buzonDeAlertas.tomarEvento();
-
+    private Evento leerEventos(){
+        return buzonDeAlertas.tomarEvento();
     }
 
     public void EnviarEvento(Evento evento) {
@@ -46,7 +45,7 @@ public class Administrador extends Thread {
        
     }
 
-    public void recibirEventoFin(Evento eventoFin) {
+    public synchronized void recibirEventoFin(Evento eventoFin) {
             eventosRecibidos.add(eventoFin);
 
         }
@@ -58,9 +57,11 @@ public class Administrador extends Thread {
 
     @Override
     public void run() {
-        while (eventosRecibidos.isEmpty() || !eventosRecibidos.peek().Esfin()) {
-            leerEventos();
+        while (eventosRecibidos.isEmpty() || eventosRecibidos.peek().Esfin()) {
+            Evento evento = leerEventos();  
+            EnviarEvento(evento);     
         }
+         System.out.println("Administrador " + id + " terminó.");
     }
     
 }
