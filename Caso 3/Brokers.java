@@ -4,43 +4,42 @@ public class Brokers extends Thread {
     private int id; 
     private BuzonEntradaEventos buzonEntradaEventos;
     private final int totalEventos;
-    private Administrador administrador;
+    private BuzonAdmin buzonAdmin;
 
     private BuzonDeAlertas buzonDeAlertas;
     private BuzonDeClasificadores buzonDeClasificadores;
 
-    public Brokers(BuzonEntradaEventos buzonEntradaEventos , BuzonDeAlertas buzonDeAlertas, BuzonDeClasificadores buzonDeClasificadores, Administrador administrador) {
+    public Brokers(BuzonEntradaEventos buzonEntradaEventos , BuzonDeAlertas buzonDeAlertas, BuzonDeClasificadores buzonDeClasificadores, BuzonAdmin buzonAdmin) {
         this.totalEventos = Configuracion.ne * (Configuracion.ni * (Configuracion.ni + 1) / 2);
         this.buzonEntradaEventos = buzonEntradaEventos;
         this.buzonDeAlertas = buzonDeAlertas;
         this.buzonDeClasificadores = buzonDeClasificadores;
-        this.administrador = administrador;
+        this.buzonAdmin = buzonAdmin;
     }
     private Evento leerEvento() {
         return buzonEntradaEventos.tomarEvento();
+
     }
 
     
 
     public  void EnviarEvento(Evento evento) {
        if (esAnomalo()) {
-            while (buzonDeAlertas.estaLleno()) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
+        while (buzonDeAlertas.estaLleno()) {
+            try {
+                 Thread.yield();
+                } catch (Exception e) {
                     Thread.currentThread().interrupt();
-                    return;
                 }
-            }
+        }
             buzonDeAlertas.depositarEvento(evento);
 
         } else {
             while (buzonDeClasificadores.estaLleno()) {
                 try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return;
+                     Thread.yield();
+                    } catch (Exception e) {
+                        Thread.currentThread().interrupt();
                 }
             }
             buzonDeClasificadores.depositarEventoClasificado(evento);
@@ -62,7 +61,7 @@ public class Brokers extends Thread {
             eventosProcessados++;
         }
         eventoFin = new Evento(id, -1);
-        administrador.recibirEventoFin(eventoFin); // sugerencia de hacer una clase de buzon admin
+        buzonAdmin.depositarEvento(eventoFin); 
         System.out.println("Broker " + id + " terminó.");
         
     }

@@ -18,11 +18,10 @@ public class Sensores extends Thread {
 
             while (buzonEntradaEventos.estaLleno()) {
             try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return; 
-            }
+                    Thread.yield();
+                } catch (Exception e) {
+                    Thread.currentThread().interrupt();
+                }
         }
             int eventoId = id * 1000 + i; 
             int tipoYServidor = ThreadLocalRandom.current().nextInt(1, Configuracion.ns);

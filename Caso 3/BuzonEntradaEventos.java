@@ -23,6 +23,7 @@ public class BuzonEntradaEventos {
                 wait(); 
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                return null;
             }
         }
         Evento e = eventos.poll();
