@@ -13,6 +13,14 @@ public class Evento {
         return TipoYServidor == -1; 
     }
 
+    public int getId() {
+        return eventoId;
+    }
+
+    public int getTipoYServidor() {
+        return TipoYServidor;
+    }
+
 
     
 }
