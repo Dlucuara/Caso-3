@@ -28,14 +28,14 @@ public class Sensores extends Thread {
             Evento evento = new Evento(eventoId, tipoYServidor);
             buzonEntradaEventos.depositarEvento(evento);
         }
-          System.out.println("Sensor " + id + " terminó.");
     }
     
 
     @Override
     public void run() {
+        System.out.println("[SENSOR " + id + "] Iniciando. Debe generar " + numeroEventos + " eventos.");
         generarEventos();
-        
+         System.out.println("[SENSOR " + id + "] TERMINÓ. Generó " + numeroEventos + " eventos.");
         
     }
 
