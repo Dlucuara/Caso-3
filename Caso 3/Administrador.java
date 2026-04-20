@@ -2,12 +2,13 @@
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Administrador extends Thread {
-    private int id;
     private BuzonDeAlertas buzonDeAlertas;
     private BuzonDeClasificadores buzonDeClasificadores;
     private BuzonAdmin buzonAdmin;
-    public Administrador(int id, BuzonDeAlertas buzonDeAlertas, BuzonDeClasificadores buzonDeClasificadores, BuzonAdmin buzonAdmin) {
-        this.id = id;
+
+    private int contadorDescartados = 0;
+    private int contadorRenviados = 0;
+    public Administrador( BuzonDeAlertas buzonDeAlertas, BuzonDeClasificadores buzonDeClasificadores, BuzonAdmin buzonAdmin) {
         this.buzonDeAlertas = buzonDeAlertas;
         this.buzonDeClasificadores = buzonDeClasificadores;
         this.buzonAdmin = buzonAdmin;
@@ -25,8 +26,8 @@ public class Administrador extends Thread {
         return buzonDeAlertas.tomarEvento();
     }
 
-    public void EnviarEvento(Evento evento) {
-        if(esNormal()){
+    public void EnviarEvento(Evento evento, boolean normal){ {
+        if(normal) {
             while (buzonDeClasificadores.estaLleno()) {
                 try {
                     Thread.yield();
@@ -46,6 +47,7 @@ public class Administrador extends Thread {
             }
                 buzonDeAlertas.decartarEvento(evento);
             }
+        }
        
     }
 
@@ -58,9 +60,18 @@ public class Administrador extends Thread {
     public void run() {
         while (buzonAdmin.estaVacio()) {
             Evento evento = leerEventos();  
-            EnviarEvento(evento);     
+            boolean normal = esNormal();
+            EnviarEvento(evento, normal); 
+            System.out.println("[ADMIN] Evento " + evento + " → " + (normal ? "REENVIADO a clasificación" : "DESCARTADO"));
+                if (normal) {
+                    contadorRenviados++;
+                } else {
+                    contadorDescartados++;
+                }
         }
-         System.out.println("Administrador " + id + " terminó.");
+      System.out.println("[ADMIN] TERMINÓ. Reenviados: " + contadorRenviados + 
+    " | Descartados: " + contadorDescartados +
+    " | Enviando " + Configuracion.nc + " eventos de fin a clasificadores.");
     }
     
 }
