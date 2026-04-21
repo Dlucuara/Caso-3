@@ -18,7 +18,7 @@ public static void main(String[] args) throws IOException, InterruptedException 
         //Creacion de buzones
         BuzonEntradaEventos buzonEntrada = new BuzonEntradaEventos();
         BuzonDeAlertas buzonDeAlertas = new BuzonDeAlertas();
-        BuzonDeClasificadores buzonDeClasificadores = new BuzonDeClasificadores(Configuracion.tam1);
+        BuzonDeClasificadores buzonDeClasificadores = new BuzonDeClasificadores();
 
         ArrayList<BuzonDeConsolidacion> buzonesConsolidacion = new ArrayList<>();
         for (int i = 0; i < Configuracion.ns; i++) {
