@@ -14,13 +14,12 @@ public class ServidoresDeConsolidacionYDespliegue extends Thread {
     public void run() {
         System.out.println("[SERVIDOR " + id + "] Iniciando.");
         
-            boolean fin = false;
-            while (!fin) {
+            while (true) {
                 Evento evento = buzonConsolidacion.tomarEventoConsolidado();
                 
                 if (evento.Esfin()) {
                     System.out.println("[SERVIDOR " + id + "] Recibió fin. Terminando.");
-                    fin =true;
+                    break;
                 }
 
                 procesarEvento(evento);

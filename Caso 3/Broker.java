@@ -1,7 +1,6 @@
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Broker extends Thread {
-    private int id; 
     private BuzonEntradaEventos buzonEntradaEventos;
     private final int totalEventos;
 
