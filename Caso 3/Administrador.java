@@ -62,14 +62,14 @@ public class Administrador extends Thread {
             Evento evento = leerEventos();  
             boolean normal = esNormal();
             EnviarEvento(evento, normal); 
-            System.out.println("[ADMIN] Evento " + evento + " → " + (normal ? "REENVIADO a clasificación" : "DESCARTADO"));
+            System.out.println("[ADMIN] Evento " + evento.getId() + " → " + (normal ? "REENVIADO a clasificacion" : "DESCARTADO"));
                 if (normal) {
                     contadorRenviados++;
                 } else {
                     contadorDescartados++;
                 }
         }
-      System.out.println("[ADMIN] TERMINÓ. Reenviados: " + contadorRenviados + 
+      System.out.println("[ADMIN] TERMINO. Reenviados: " + contadorRenviados + 
     " | Descartados: " + contadorDescartados +
     " | Enviando " + Configuracion.nc + " eventos de fin a clasificadores.");
     }

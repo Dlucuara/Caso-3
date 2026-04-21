@@ -5,17 +5,16 @@ public class Clasificadores extends Thread{
     private ArrayList<BuzonDeConsolidacion> buzonDeConsolidacion;
     private int ns = Configuracion.ns;
 
-    public Clasificadores(BuzonDeClasificadores buzonDeClasificadores) {
+    public Clasificadores(BuzonDeClasificadores buzonDeClasificadores, ArrayList<BuzonDeConsolidacion> buzonDeConsolidacion) {
         this.buzonDeClasificadores = buzonDeClasificadores;
-        for (int i=0; i<ns; i++) {
-            this.buzonDeConsolidacion.add(new BuzonDeConsolidacion(i, Configuracion.tam2));
-        }
+        this.buzonDeConsolidacion = buzonDeConsolidacion;
     }
 
     @Override
     public void run() {
         while (buzonDeClasificadores.estaLleno()) {
             try {
+                System.out.println("Buzon de clasificadores lleno, esperando a que se libere espacio...");
                 wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -23,6 +22,7 @@ public class Clasificadores extends Thread{
         }
             Evento evento = buzonDeClasificadores.tomarEventoClasificado();
             clasificarEvento(evento);
+            System.out.println("Evento clasificado: " + evento.getTipoYServidor());
     }
 
 

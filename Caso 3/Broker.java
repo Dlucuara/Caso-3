@@ -64,8 +64,8 @@ public class Broker extends Thread {
 
             boolean anomalo = esAnomalo();         
             EnviarEvento(evento, anomalo);        
-            System.out.println("[BROKER] Evento " + evento + 
-                " → " + (anomalo ? "ALERTA" : "CLASIFICACIÓN"));
+            System.out.println("[BROKER] Evento " + evento.getId() + 
+                " → " + (anomalo ? "ALERTA" : "CLASIFICACION"));
             if (anomalo) contadorAlertas++;
             else contadorNormales++;
             eventosProcessados++;
@@ -76,7 +76,7 @@ public class Broker extends Thread {
             " | Clasificados: " + contadorNormales);
 
         buzonAdmin.depositarEvento(new Evento(id, -1));
-        System.out.println("[BROKER] TERMINÓ. Evento de fin enviado al administrador.");
+        System.out.println("[BROKER] TERMINO. Evento de fin enviado al administrador.");
     }
 }
 
