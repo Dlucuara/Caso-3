@@ -4,20 +4,18 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Administrador extends Thread {
     private BuzonDeAlertas buzonDeAlertas;
     private BuzonDeClasificadores buzonDeClasificadores;
-    private BuzonAdmin buzonAdmin;
 
     private int contadorDescartados = 0;
     private int contadorRenviados = 0;
-    public Administrador( BuzonDeAlertas buzonDeAlertas, BuzonDeClasificadores buzonDeClasificadores, BuzonAdmin buzonAdmin) {
+    public Administrador( BuzonDeAlertas buzonDeAlertas, BuzonDeClasificadores buzonDeClasificadores) {
         this.buzonDeAlertas = buzonDeAlertas;
         this.buzonDeClasificadores = buzonDeClasificadores;
-        this.buzonAdmin = buzonAdmin;
     }
 
     private Evento leerEventos(){
         while (buzonDeAlertas.estaVacio()) {
             try {
-                 Thread.yield();
+                 Thread.sleep(100); 
                 } catch (Exception e) {
                     Thread.currentThread().interrupt();
                 }
@@ -30,48 +28,57 @@ public class Administrador extends Thread {
         if(normal) {
             while (buzonDeClasificadores.estaLleno()) {
                 try {
-                    Thread.yield();
+                    Thread.sleep(100); 
                 } catch (Exception e) {
                     Thread.currentThread().interrupt();
             }
-            buzonDeClasificadores.depositarEventoClasificado(evento);
+           
         }
-        }else {
-                while (buzonDeAlertas.estaLleno()) {
-                    try {
-                        Thread.yield();
-                    } catch (Exception e) {
-                        Thread.currentThread().interrupt();
-                        return;
-                }
-            }
-                buzonDeAlertas.decartarEvento(evento);
-            }
+         buzonDeClasificadores.depositarEventoClasificado(evento);
+        }
+        // se descarta el evento, no se hace nada
         }
        
     }
 
         private boolean esNormal() {
-            int numeroSeudoAleatorio =ThreadLocalRandom.current().nextInt(0, 20);
+            int numeroSeudoAleatorio =ThreadLocalRandom.current().nextInt(0, 21);
             return numeroSeudoAleatorio % 4 == 0;
         }
 
+        private void enviarFinAClasificadores() {
+        System.out.println("[ADMIN] Enviando " + Configuracion.nc + " eventos de fin a clasificadores.");
+        for (int i = 0; i < Configuracion.nc; i++) {
+            buzonDeClasificadores.depositarEventoClasificado(new Evento(-1, -1));
+        }
+    }
+
     @Override
     public void run() {
-        while (buzonAdmin.estaVacio()) {
-            Evento evento = leerEventos();  
+        System.out.println("[ADMIN] Iniciando.");
+
+        while (true) {
+            Evento evento = leerEventos();
+
+            if (evento.Esfin()) {
+                System.out.println("[ADMIN] Recibió evento de fin del broker.");
+                break;
+            }
+
             boolean normal = esNormal();
-            EnviarEvento(evento, normal); 
-            System.out.println("[ADMIN] Evento " + evento + " → " + (normal ? "REENVIADO a clasificación" : "DESCARTADO"));
-                if (normal) {
-                    contadorRenviados++;
-                } else {
-                    contadorDescartados++;
-                }
+            EnviarEvento(evento, normal);
+
+            System.out.println("[ADMIN] Evento " + evento + " -> " 
+                + (normal ? "REENVIADO a clasificacion" : "DESCARTADO"));
+
+            if (normal) contadorRenviados++;
+            else contadorDescartados++;
         }
-      System.out.println("[ADMIN] TERMINÓ. Reenviados: " + contadorRenviados + 
-    " | Descartados: " + contadorDescartados +
-    " | Enviando " + Configuracion.nc + " eventos de fin a clasificadores.");
+
+        System.out.println("[ADMIN] TERMINO. Reenviados: " + contadorRenviados
+            + " | Descartados: " + contadorDescartados);
+
+        enviarFinAClasificadores();
     }
     
 }

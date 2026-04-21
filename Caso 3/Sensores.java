@@ -24,7 +24,7 @@ public class Sensores extends Thread {
                 }
         }
             int eventoId = id * 1000 + i; 
-            int tipoYServidor = ThreadLocalRandom.current().nextInt(1, Configuracion.ns);
+            int tipoYServidor = ThreadLocalRandom.current().nextInt(1, Configuracion.ns + 1);
             Evento evento = new Evento(eventoId, tipoYServidor);
             buzonEntradaEventos.depositarEvento(evento);
         }

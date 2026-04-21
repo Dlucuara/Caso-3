@@ -11,6 +11,9 @@ public class BuzonEntradaEventos {
     public synchronized boolean estaLleno() {
         return false; // nunca se llena porque es ilimitado
     }
+    public synchronized boolean estaVacio() {
+    return eventos.isEmpty();
+}
 
     public synchronized void depositarEvento(Evento evento) {
         eventos.add(evento);

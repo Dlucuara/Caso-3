@@ -1,57 +1,69 @@
 import java.util.ArrayList;
 
 public class Clasificadores extends Thread{
+    private int id;
     private BuzonDeClasificadores buzonDeClasificadores;
     private ArrayList<BuzonDeConsolidacion> buzonDeConsolidacion;
-    private int ns = Configuracion.ns;
+    private int contador = 0;
 
-    public Clasificadores(BuzonDeClasificadores buzonDeClasificadores) {
+    private static int clasificadoresActivos;
+    private static final Object lockContador = new Object();
+
+
+    public static void inicializarContador(int nc) {
+        clasificadoresActivos = nc;
+    }
+
+    public Clasificadores(BuzonDeClasificadores buzonDeClasificadores, int id, ArrayList<BuzonDeConsolidacion> buzonesConsolidacion) {
         this.buzonDeClasificadores = buzonDeClasificadores;
-        for (int i=0; i<ns; i++) {
-            this.buzonDeConsolidacion.add(new BuzonDeConsolidacion(i, Configuracion.tam2));
-        }
+        this.id = id;
+        this.buzonDeConsolidacion = buzonesConsolidacion;
+        
+        
     }
 
     @Override
     public void run() {
-        while (buzonDeClasificadores.estaLleno()) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        System.out.println("[CLASIFICADOR " + id + "] Iniciando.");
+        while (true) {
+            Evento evento = buzonDeClasificadores.tomarEventoClasificado();
+            if (evento.Esfin()) {
+                System.out.println("[CLASIFICADOR " + id + "] Recibió evento de fin.");
+                verificarUltimo();
+                break;
+            }
+
+            clasificarEvento(evento);
+            contador++;
+        }
+
+        System.out.println("[CLASIFICADOR " + id + "] TERMINÓ. Eventos clasificados: " + contador);
+    }
+
+    private void verificarUltimo() {
+    synchronized (lockContador) {
+        clasificadoresActivos--;
+        System.out.println("[CLASIFICADOR " + id + "] Clasificadores restantes: " + clasificadoresActivos);
+
+        if (clasificadoresActivos == 0) {
+            System.out.println("[CLASIFICADOR " + id + "] Soy el último. Enviando fin a "
+                + Configuracion.ns + " servidores.");
+
+            for (int i = 0; i < Configuracion.ns; i++) {
+                buzonDeConsolidacion.get(i).depositarEventoConsolidado(new Evento(-1, -1));
+                System.out.println("[CLASIFICADOR " + id + "] Fin enviado a Servidor " + (i + 1));
             }
         }
-            Evento evento = buzonDeClasificadores.tomarEventoClasificado();
-            clasificarEvento(evento);
     }
+    }
+    
 
 
     public void clasificarEvento(Evento evento) {
-        int tipoClasificacion = evento.getTipoYServidor();
-        if (tipoClasificacion == -1) {
-            for (int i=0; i<ns; i++) {
-            while (buzonDeConsolidacion.get(i).estaLleno()) {
-                try {
-                    wait();
-                } catch (Exception e) {
-                    Thread.currentThread().interrupt();
-                }
-                Evento eventoFin = new Evento(i, -1);
-                buzonDeConsolidacion.get(i).depositarEventoConsolidado(eventoFin);
-            }                
-            }
-        }
-        else {
-            while (buzonDeConsolidacion.get(tipoClasificacion).estaLleno()) {
-                try {
-                    wait();
-                } catch (Exception e) {
-                    Thread.currentThread().interrupt();
-                }
-            int servidorAsignado = evento.getTipoYServidor();
-            buzonDeConsolidacion.get(servidorAsignado).depositarEventoConsolidado(evento);
-            }                   
-        }
+        int tipoClasificacion = evento.getTipoYServidor() - 1; 
+        buzonDeConsolidacion.get(tipoClasificacion).depositarEventoConsolidado(evento);
+        System.out.println("[CLASIFICADOR " + id + "] " + evento + " -> Servidor " + (tipoClasificacion + 1));
+       
         
     }
 }

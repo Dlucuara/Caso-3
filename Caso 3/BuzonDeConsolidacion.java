@@ -12,20 +12,41 @@ public class BuzonDeConsolidacion {
         this.eventos = new LinkedList<>();
     }
 
-    public void depositarEventoConsolidado(Evento evento) {
+    public synchronized void depositarEventoConsolidado(Evento evento) {
+        while (estaLleno()) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         eventos.add(evento);
+        notifyAll();
     }
 
-    public boolean estaLleno() {
+    public synchronized boolean estaLleno() {
         return eventos.size() == capacidad;
     }
 
-    public Evento tomarEventoConsolidado() {
-        return eventos.poll();
+    public synchronized Evento tomarEventoConsolidado() {
+        while (eventos.isEmpty()) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        Evento evento = eventos.poll();
+        notifyAll();
+        return evento;
     }
 
     public int getId() {
         return id;
     }
+
+    public synchronized boolean estaVacio() {
+    return eventos.isEmpty();
+}
     
 }

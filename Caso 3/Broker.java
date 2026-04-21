@@ -4,7 +4,6 @@ public class Broker extends Thread {
     private int id; 
     private BuzonEntradaEventos buzonEntradaEventos;
     private final int totalEventos;
-    private BuzonAdmin buzonAdmin;
 
     private BuzonDeAlertas buzonDeAlertas;
     private BuzonDeClasificadores buzonDeClasificadores;
@@ -12,12 +11,11 @@ public class Broker extends Thread {
     private int contadorAlertas = 0;
     private int contadorNormales = 0;
     
-    public Broker(BuzonEntradaEventos buzonEntradaEventos , BuzonDeAlertas buzonDeAlertas, BuzonDeClasificadores buzonDeClasificadores, BuzonAdmin buzonAdmin) {
+    public Broker(BuzonEntradaEventos buzonEntradaEventos , BuzonDeAlertas buzonDeAlertas, BuzonDeClasificadores buzonDeClasificadores) {
         this.totalEventos = Configuracion.ne * (Configuracion.ni * (Configuracion.ni + 1) / 2);
         this.buzonEntradaEventos = buzonEntradaEventos;
         this.buzonDeAlertas = buzonDeAlertas;
         this.buzonDeClasificadores = buzonDeClasificadores;
-        this.buzonAdmin = buzonAdmin;
     }
     private Evento leerEvento() {
         return buzonEntradaEventos.tomarEvento();
@@ -30,7 +28,7 @@ public class Broker extends Thread {
        if (anomalo) {
         while (buzonDeAlertas.estaLleno()) {
             try {
-                 Thread.yield();
+                 Thread.sleep(100); 
                 } catch (Exception e) {
                     Thread.currentThread().interrupt();
                 }
@@ -40,7 +38,7 @@ public class Broker extends Thread {
         } else {
             while (buzonDeClasificadores.estaLleno()) {
                 try {
-                     Thread.yield();
+                     Thread.sleep(100); 
                     } catch (Exception e) {
                         Thread.currentThread().interrupt();
                 }
@@ -64,8 +62,7 @@ public class Broker extends Thread {
 
             boolean anomalo = esAnomalo();         
             EnviarEvento(evento, anomalo);        
-            System.out.println("[BROKER] Evento " + evento + 
-                " → " + (anomalo ? "ALERTA" : "CLASIFICACIÓN"));
+            System.out.println("[BROKER] Evento " + evento.toString() + " -> " + (anomalo ? "ALERTA" : "CLASIFICACION"));
             if (anomalo) contadorAlertas++;
             else contadorNormales++;
             eventosProcessados++;
@@ -75,7 +72,8 @@ public class Broker extends Thread {
             " | Alertas: " + contadorAlertas +
             " | Clasificados: " + contadorNormales);
 
-        buzonAdmin.depositarEvento(new Evento(id, -1));
+        buzonDeAlertas.depositarEvento(new Evento(-1, -1)); 
+
         System.out.println("[BROKER] TERMINÓ. Evento de fin enviado al administrador.");
     }
 }

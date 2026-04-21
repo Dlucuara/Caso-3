@@ -1,16 +1,16 @@
 public class Evento {
     private int eventoId;
-    private int TipoYServidor;
+    private int tipoYServidor;
 
 
     public Evento(int eventoId, int tipoYServidor) {
         this.eventoId = eventoId;
-        this.TipoYServidor = tipoYServidor;
+        this.tipoYServidor = tipoYServidor;
     }
 
     // se define un evento de fin con tipoYServidor = -1
     public boolean Esfin() {
-        return TipoYServidor == -1; 
+        return tipoYServidor == -1; 
     }
 
     public int getId() {
@@ -18,8 +18,16 @@ public class Evento {
     }
 
     public int getTipoYServidor() {
-        return TipoYServidor;
+        return tipoYServidor;
     }
+
+    @Override
+    public String toString() {
+    if (Esfin()) {
+        return "[EventoFin]";
+    }
+    return "[Evento id=" + eventoId + " tipo=" + tipoYServidor + "]";
+}
 
 
     

@@ -25,9 +25,6 @@ public class BuzonDeAlertas {
 
     }
 
-    public synchronized void decartarEvento(Evento evento) {
-        eventos.remove(evento);
-
-    }
+ 
     
 }

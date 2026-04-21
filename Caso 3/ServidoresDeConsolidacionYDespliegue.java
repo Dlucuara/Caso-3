@@ -1,34 +1,45 @@
 import java.util.Random;
 
-// ServidorConsolidacion.java
 public class ServidoresDeConsolidacionYDespliegue extends Thread {
+    private int id;
     private BuzonDeConsolidacion buzonConsolidacion;
+    private int contador = 0;
 
-    public ServidoresDeConsolidacionYDespliegue(BuzonDeConsolidacion buzon) {
+    public ServidoresDeConsolidacionYDespliegue( int id, BuzonDeConsolidacion buzon) {
+        this.id = id;
         this.buzonConsolidacion = buzon;
     }
 
     @Override
     public void run() {
-        try {
+        System.out.println("[SERVIDOR " + id + "] Iniciando.");
+        
             boolean fin = false;
             while (!fin) {
                 Evento evento = buzonConsolidacion.tomarEventoConsolidado();
                 
                 if (evento.Esfin()) {
-                    System.out.println(Thread.currentThread().getName() + " - Evento de fin recibido. Finalizando.");
+                    System.out.println("[SERVIDOR " + id + "] Recibió fin. Terminando.");
                     fin =true;
                 }
 
-                // Procesar el evento durante un tiempo aleatorio entre 100 y 1000 ms
-                Random rand = new Random();
-                int tiempoProceso = 100 + rand.nextInt(901);  // Entre 100 ms y 1000 ms
-                System.out.println(Thread.currentThread().getName() + " - Procesando evento: " + evento.getId());
-                Thread.sleep(tiempoProceso);  // Simula el procesamiento del evento
-                System.out.println(Thread.currentThread().getName() + " - Evento procesado: " + evento.getId());
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+                procesarEvento(evento);
+                contador++;
         }
+
+        System.out.println("[SERVIDOR " + id + "] TERMINÓ. Procesados: " + contador);
+    }
+
+    private void procesarEvento(Evento evento) {
+        int tiempo = 100 + new Random().nextInt(901); // entre 100ms y 1000ms
+        System.out.println("[SERVIDOR " + id + "] Procesando " + evento + " durante " + tiempo + "ms...");
+        try {
+            Thread.sleep(tiempo);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        System.out.println("[SERVIDOR " + id + "] " + evento + " procesado.");
+        
+        
     }
 }

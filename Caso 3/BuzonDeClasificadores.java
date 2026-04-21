@@ -11,16 +11,37 @@ public class BuzonDeClasificadores {
         this.eventos = new LinkedList<>();
     }
 
-    public void depositarEventoClasificado(Evento evento) {
+    public synchronized void depositarEventoClasificado(Evento evento) {
+        while (estaLleno()) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }   
         eventos.add(evento);
+        notifyAll();
     }
 
     public boolean estaLleno() {
         return eventos.size() == capacidad;
     }
 
-    public Evento tomarEventoClasificado() {
-        return eventos.poll();
+    public synchronized boolean estaVacio() {
+    return eventos.isEmpty();
+}
+
+    public synchronized Evento tomarEventoClasificado() {
+            while (eventos.isEmpty()) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            Evento evento = eventos.poll();
+            notifyAll();
+        return evento;
     }
     
 }
